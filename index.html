@@ -16,23 +16,36 @@
                 border: 1px solid #CCC;
             } */
 
-            .maxWidth {
-                max-width: 800px;
+            table, tr, td {
+                border: 1px solid black;
+                text-align: center;
             }
-            /* .border1px {
+            td {
+                padding-right: 10px;
+                padding-left: 10px;
+            }
+
+            .maxWidth {
+                max-width: 1200px;
+            }
+            .border1px {
                 border: 1px solid;
-            } */
+            }
             .center {
                 margin: auto;
             }
         </style>
     </head>
     <body>
+        <div id="testBio" class="border1px"></div>
+        <div id="testMed" class="border1px"></div>
+        <div id="testAppointment" class="border1px"></div>
+
         <div class="container border1px">
             <div style="display:flex; flex-direction: row; justify-content: center; align-items: center">
                 <div>
                     <h1>Thyroid Tracker</h1>
-                    <h5> Hi Thang Tran</h5>
+                    <h5> Hi <span id="greetingName"><span></h5>
                 </div>
                 <div>
                     <img src="https://www.niddk.nih.gov/-/media/Images/Health-Information/Endocrine-Diseases/ThyroidAnatomy_758x864.jpg" class="img-thumbnail" alt="..." style="width: auto; height: 150px">
@@ -45,8 +58,7 @@
                     <div class="maxWidth border1px ">
                         <h5 class="border1px">Medications</h4>
                         <ul>
-                            <li>Methiazole 5 mg</li>
-                            <li>Propanolol 20 mg</li>
+                            <li id="meds"></li>
                         </ul>
                     </div>    
         
@@ -59,140 +71,200 @@
 
                 <div class="maxWidth border1px center">
                     <h4>Bio info</h4>
-                    <ul>
-                        <li>Full name: Thang Tran</li> 
-                        <li>Gender: Male</li>
-                        <li>DoB: 03/08/1992</li>
-                        <li>Address: Phoenix, AZ</li>    
-                    </ul>
-                    
+                    <table>
+                        <tr>
+                            <td>Full name: </td>
+                            <td id="fullName"></td>
+                        </tr>
+                        <tr>
+                            <td>Gender: </td>
+                            <td id="gender"></td>
+                        </tr>
+                        <tr>
+                            <td>Birth Date: </td>
+                            <td id="dob"></td>
+                        </tr>
+                        <tr>
+                            <td>Race: </td>
+                            <td id="race"></td>
+                        </tr> 
+                        <!-- <tr>
+                            <td>Ethnicity: </td>
+                            <td id="ethnicity"></td>
+                        </tr>  -->
+                    </table>
                 </div>
-
-                    
-
             </div>
-
-                        
 
             <div class="maxWidth border1px center">
                 <h5>TSH status</h4>
-                <!-- <div id="obs">Loading...</div> -->
-                <form action="/action_page.php" style="display: flex; flex-direction: row">
-                    <label for="datePrompt">Date:</label>
-                    <input type="text" id="date" name="date"><br><br>
-                    <label for="tshPrompt">TSH:</label>
-                    <input type="text" id="tsh" name="tsh"><br><br>
-                    <hr>
-                    <input type="submit" value="Add TSH result">
-                </form>
-        
-                <svg width="800" height="400"></svg>
-            </div>
-
-
+                <div id="tshTable">
+                    <table>
+                        <tr>
+                            <td><b>Recent Dates</b></td>
+                            <td>...</td>
+                            <td id="date1"></td>
+                            <td id="date2"></td>
+                            <td id="date3"></td>
+                            <td id="date4"></td>
+                            <td>New Date:<input type="text" id="tshNewDate" placeholder="yyyy-mm-dd"></td>
+                            <td rowspan="2"><button onclick="addMoreTSH()">Add TSH <br> result</button></td>
+                        </tr>
+                        <tr>
+                            <td><b>TSH mIU/L</b></td>
+                            <td>...</td>
+                            <td id="tsh1"></td>
+                            <td id="tsh2"></td>
+                            <td id="tsh3"></td>
+                            <td id="tsh4"></td>
+                            <td>New TSH: <input type="text" id="tshNewValue" placeholder="#.###"></td>
+                        </tr>
+                    </table>
+                </div>
+                <svg id="tshGraph"></svg>
+            </div> 
         </div>
-            
-                
-                
-                
-                
-            
-        </div>
-        
+
         <script type="text/javascript">
             window.globalClient = null
-            window.year = 2028
-            svg = d3.select("svg")
-            margin = 100,
-            width = svg.attr("width") - margin, //300
-            height = svg.attr("height") - margin //200
-            xScale = null
-            yScale = null
 
-            function drawPlane() {
-                // Step 3
-                console.log("plane tsh" + tsh_result)
-                
-                g = svg.append("g").attr("transform", "translate(" + 100 + "," + 50 + ")");
-                
-                svg.append('text')
-                .attr('x', width/2 + 100)
-                .attr('y', 100)
-                .attr('text-anchor', 'middle')
-                .style('font-family', 'Helvetica')
-                .style('font-size', 20)
-                .text('TSH over time');
-                
-                // X label
-                svg.append('text')
-                .attr('x', width/2 + 100)
-                .attr('y', height - 15 + 150)
-                .attr('text-anchor', 'middle')
-                .style('font-family', 'Helvetica')
-                .style('font-size', 12)
-                .text('Time');
-                
-                // Y label
-                svg.append('text')
-                .attr('text-anchor', 'middle')
-                .attr('transform', 'translate(60,' + height + ')rotate(-90)')
-                .style('font-family', 'Helvetica')
-                .style('font-size', 12)
-                .text('TSH');
-            }
-
-            function drawAxises() {
-                console.log("axis tsh" + tsh_result)
-
-                tsh_result.forEach(function(d) {
-                    d[0] = d3.timeParse("%Y-%m-%d")(d[0]);
-                });
-
-                // Step 4 
-                xScale = d3.scaleTime().domain(d3.extent(tsh_result, function(d) {
-                        return d[0];
-                })).range([0, width]);
-                yScale = d3.scaleLinear().domain([-4, 10]).range([height, 0]);
-
-                // Step 6
-                g.append("g")
-                .attr("transform", "translate(0," + height + ")")
-                .call(d3.axisBottom(xScale));
-                
-                g.append("g")
-                .call(d3.axisLeft(yScale));
-
-            }
-                
             function drawData() {
-                console.log("data tsh" + tsh_result)
-
-                // Step 7
-                svg.append('g')
-                .selectAll("dot")
-                .data(tsh_result)
-                .enter()
-                .append("circle")
-                .attr("cx", function (d) { return xScale(d[0]); } )
-                .attr("cy", function (d) { return yScale(d[1]); } )
-                .attr("r", 3)
-                .attr("transform", "translate(" + 100 + "," + 100 + ")")
-                .style("fill", "#CC0000");
-
-                // Step 8        
-                var line = d3.line()
-                .x(function(d) { return xScale(d[0]); }) 
-                .y(function(d) { return yScale(d[1]); }) 
-                .curve(d3.curveMonotoneX)
+                n = tsh_result.length
+                tsh_result.sort()
+                console.log(tsh_result)
+                let k = 4;
+                for(i = 1; i <= k; i++) {
+                    document.getElementById('date' + i).innerHTML = tsh_result[n-(k-i+1)][0]
+                    document.getElementById('tsh' + i).innerHTML = tsh_result[n-(k-i+1)][1]
+                }
                 
+                console.log(tsh_result)
+                
+                // margin
+                var margin = {top: 30, right: 90, bottom: 30, left: 60},
+                    svgWidth = 1000,
+                    svgHeight = 380, 
+                    width = svgWidth - margin.left - margin.right,
+                    height = svgHeight - margin.top - margin.bottom;
+                
+                // translate the whole graph (which is put inside a 'g' in svg) to have the margin
+                var svg = d3.select("#tshGraph")
+                                .attr("width", svgWidth)
+                                .attr("height", svgHeight)
+                            .append("g")
+                                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                
+                // draw Title, X lable, Y lable
+                svg.append('text') // Title
+                        .attr('x', width/2)
+                        .attr('y', 0)
+                        .attr('text-anchor', 'middle')
+                        .style('font-family', 'Helvetica')
+                        .style('font-size', 30)
+                        .style('fill', 'red')
+                        .text('TSH over time');
+                
+                svg.append('text') // X label
+                        .attr('x', width/2)
+                        .attr('y', height + margin.bottom)
+                        .attr('text-anchor', 'middle')
+                        .style('font-family', 'Helvetica')
+                        .style('font-size', 16)
+                        .text('Time');
+                        
+                svg.append('text') // Y label
+                        .attr('text-anchor', 'middle')
+                        .attr('transform', 'translate(-' + margin.left/2 + ', ' + height/2 + ')rotate(-90)')
+                        .style('font-family', 'Helvetica')
+                        .style('font-size', 16)
+                        .text('TSH (mIU/L)');
+                
+                // create xScale, yScale
+                xScale = d3.scaleTime().domain(d3.extent(tsh_result, d => d3.timeParse("%Y-%m-%d")(d[0]))).range([0, width]);
+                yScale = d3.scaleLinear().domain([0, 10]).range([height, 0]);
+
+                // draw X axis, Y axis
+                var reformat_x_tick = function(date) {
+                    if (d3.timeYear(date) < date) {
+                        return d3.timeFormat('%b')(date);
+                    } else {
+                        return d3.timeFormat('%Y')(date);
+                    }
+                }
+                svg.append("g")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(d3.axisBottom(xScale).tickFormat(reformat_x_tick));
+                
+                svg.append("g")
+                        .call(d3.axisLeft(yScale));
+
+                // draw dots for data points
+                svg.append('g')
+                        .selectAll("dot")
+                        .data(tsh_result)
+                        .enter()
+                        .append("circle")
+                        .attr("cx", d => xScale(d3.timeParse("%Y-%m-%d")(d[0])))
+                        .attr("cy", d => yScale(d[1]))
+                        .attr("r", 6)
+                        .style("fill", "red");
+                
+                // draw path going throuh data points
                 svg.append("path")
-                .datum(tsh_result) 
-                .attr("class", "line") 
-                .attr("transform", "translate(" + 100 + "," + 100 + ")")
-                .attr("d", line)
-                .style("fill", "none")
-                .style("stroke", "#CC0000")
-                .style("stroke-width", "2");
+                    .datum(tsh_result)
+                    .attr("fill", "none")
+                    .attr("stroke", "red")
+                    .attr("stroke-width", 2)
+                    .attr("d", d3.line()
+                        .x(d => xScale(d3.timeParse("%Y-%m-%d")(d[0])))
+                        .y(d => yScale(d[1]))
+                        );
+                
+                // draw the Low, High normal 
+                svg.append('line')
+                    .style("stroke", "green")
+                    .style("stroke-width", 1)
+                    .style("stroke-dasharray", ("3, 3"))
+                    .attr("x1", 0)
+                    .attr("y1", yScale(5))
+                    .attr("x2", width)
+                    .attr("y2", yScale(5));
+                
+                svg.append('text') // X label
+                    .attr('x', width + 15)
+                    .attr('y', yScale(5))
+                    // .attr('text-anchor', 'middle')
+                    .style('font-family', 'Helvetica')
+                    .style('font-size', 12)
+                    .style('fill', 'green')
+                    .text('High: 5 mIU/L');
+                
+                svg.append('line')
+                    .style("stroke", "green")
+                    .style("stroke-width", 1)
+                    .style("stroke-dasharray", ("3, 3"))
+                    .attr("x1", 0)
+                    .attr("y1", yScale(0.5))
+                    .attr("x2", width)
+                    .attr("y2", yScale(0.5));
+                
+                svg.append('text')
+                    .attr('x', width + 15)
+                    .attr('y', yScale(0.5))
+                    // .attr('text-anchor', 'middle')
+                    .style('font-family', 'Helvetica')
+                    .style('font-size', 12)
+                    .style('fill', 'green')
+                    .text('Low: 0.5 mIU/L');
+                
+                svg.append('text')
+                    .attr('x', width - 45)
+                    .attr('y', 0)
+                    .attr('text-anchor', 'middle')
+                    .style('font-family', 'Helvetica')
+                    .style('font-size', 18)
+                    .style('fill', 'green')
+                    .text('Normal TSH range: 0.5-5.0 mIU/L');
             }
 
             function addMoreTSH(){
@@ -214,31 +286,38 @@
                         "effectiveDateTime": "",
                         "component": [
                             {
-                            "code": {
-                                "coding": [
-                                {
-                                    "system": "http://loinc.org",
-                                    "code": "11580-8",
-                                    "display": "thyroid stimulating hormone"
+                                "code": {
+                                    "coding": [
+                                    {
+                                        "system": "http://loinc.org",
+                                        "code": "11580-8",
+                                        "display": "thyroid stimulating hormone"
+                                    }
+                                    ]
+                                },
+                                "valueQuantity": {
+                                    "value": 0,
+                                    "unit": "mIU/L",
+                                    "system": "http://unitsofmeasure.org",
+                                    "code": "m[iU]/L"
                                 }
-                                ]
-                            },
-                            "valueQuantity": {
-                                "value": 10,
-                                "unit": "mIU/L",
-                                "system": "http://unitsofmeasure.org",
-                                "code": "m[iU]/L"
-                            }
                             }
                         ]
                     }  
                 observation["subject"]["reference"] = "Patient/" + globalClient.patient.id
-                window.year++;
-                new_date = window.year + '-01-01'
-                observation.effectiveDateTime = new_date
-                document.getElementById('obs').innerHTML = new_date
+                let newDate = document.getElementById('tshNewDate').value
+                let newTSH = document.getElementById('tshNewValue').value
+                observation.effectiveDateTime = newDate
+                observation.component[0].valueQuantity.value = newTSH 
                 window.globalClient.create(observation)
-                showObservation(globalClient);
+                window.tsh_result.push([newDate, newTSH])
+                // window.tsh_result.sort()
+                d3.select("#tshGraph").selectAll("*").remove();
+                // drawAxises();
+                drawData();
+                document.getElementById('tshNewDate').value="";
+                document.getElementById('tshNewValue').value="";
+                // showObservation(globalClient);
             }
 
             function addMethimazoleMeds(client) {
@@ -265,7 +344,7 @@
                 client.create(medicationRequest)
             }
 
-            function addTSHLab(client) {
+            function initializeTSHData(client) {
                 let observation =
                     {
                         "resourceType": "Observation",
@@ -304,19 +383,35 @@
                     }  
                 observation["subject"]["reference"] = "Patient/" + client.patient.id
 
-                n = Math.floor(Math.random() * 3 + 3);
-                start = new Date(2018, 0, 1)
-                end = new Date(2023, 11, 11)
-                rd = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+                sampleTSHdata = [
+                    ['2021-08-17', 0.32],
+                    ['2021-12-08', 1.58],
+                    ['2022-04-19', 7.89],
+                    ['2022-07-01', 6.23],
+                    ['2022-11-15', 2.15],
+                    ['2023-02-01', 6.84],
+                    ['2023-07-05', 4.42]
+                ]
+
+                // n = Math.floor(Math.random() * 3 + 3);
+                // start = new Date(2018, 0, 1)
+                // end = new Date(2023, 11, 11)
+                // rd = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
                 
-                for (i = 0; i < n; i++) {
-                    observation.effectiveDateTime = rd.toISOString().split('T')[0]
-                    // rd.getFullYear() + "-" + (rd.getMonth()+1) + "-" + rd.getDate(), Math.random()*10
-                    observation.component[0].valueQuantity.value = Math.random()*10;
-                    console.log('effectiveDateTime = ' + observation.effectiveDateTime)
-                    rd.setDate(rd.getDate() - 100);
+                // for (i = 0; i < n; i++) {
+                //     observation.effectiveDateTime = rd.toISOString().split('T')[0]
+                //     observation.component[0].valueQuantity.value = Math.round(Math.random()*9*100)/100;
+                //     console.log('effectiveDateTime = ' + observation.effectiveDateTime + ' value = ' + observation.component[0].valueQuantity.value)
+                //     rd.setDate(rd.getDate() - 100);
+                //     client.create(observation)
+                // }
+                
+                for (i = 0; i < sampleTSHdata.length; i++) {
+                    observation.effectiveDateTime = sampleTSHdata[i][0]
+                    observation.component[0].valueQuantity.value = sampleTSHdata[i][1]
+                    // console.log('effectiveDateTime = ' + observation.effectiveDateTime + ' value = ' + observation.component[0].valueQuantity.value)
                     client.create(observation)
-                }  
+                }
             }
 
             function showObservation(client) {
@@ -342,24 +437,34 @@
                 // Render the current patient's Observations (or any error)
                 .then(
                     function(obs) {
-                        // document.getElementById("obs").innerText = JSON.stringify(obs, null, 4);
-                        // document.getElementById("obs").innerText = 
+                        // document.getElementById("test").innerText = JSON.stringify(obs, null, 4);
                         // (obs[0]['resource']['effectiveDateTime'] + ":" + obs[0]['resource']['component'][0]['valueQuantity']['value']);  
                         let n = obs.length
-                        tsh_result = []
+                        console.log('real count: ' + n)
+                        window.tsh_result = []
+                        let tsh_map = new Map()
                         for (i = 0; i < n; i++) {
-                            tsh_result.push([obs[i]['resource']['effectiveDateTime'], 
-                                             obs[i]['resource']['component'][0]['valueQuantity']['value']]);
+                            value = obs[i]['resource']['component'][0]['valueQuantity']['value']
+                            effdate = obs[i]['resource']['effectiveDateTime']
+                            tsh_map.set(effdate, value)
                         }
-                        console.log(tsh_result)
-                        drawPlane();
-                        drawAxises();
+                        tsh_map.forEach(function(value, key, map) {window.tsh_result.push([key, value])})
+
+                        
+                        // window.tsh_result.sort()
+                        // window.tsh_result.forEach(function(item) {
+                        //     year  = item[0].substring(0, 4);
+                        //     month = item[0].substring(5, 7);
+                        //     day   = item[0].substring(8);
+                        //     item[0] = new Date(year, month, day)
+                        // })
+                        // console.log(window.tsh_result)
                         drawData();            
-                },
-                function(error) {
-                    document.getElementById("obs").innerText = error.stack;
-                }
-            );
+                    },
+                    function(error) {
+                        document.getElementById("obs").innerText = error.stack;
+                    }
+                );
             }
 
             FHIR.oauth2.ready().then(function(client) {
@@ -369,9 +474,14 @@
                 client.patient.read().then(
                     function(pt) {
                         // patient_test = JSON.parse(pt)
-                        console.log('type of pt = ', pt["name"][0]["given"][0])
+                        document.getElementById("testBio").innerText = JSON.stringify(pt, null, 4);
+                        let fullname = pt["name"][0]["given"][0] + " " + pt["name"][0]["family"]
+                        document.getElementById('greetingName').innerHTML = fullname
+                        document.getElementById('fullName').innerHTML = fullname
 
-                        // document.getElementById("patient").innerText = JSON.stringify(pt, null, 4);
+                        document.getElementById('gender').innerHTML = pt["gender"]
+                        document.getElementById('dob').innerHTML = pt["birthDate"]
+                        document.getElementById('race').innerHTML = pt['extension'][0]['extension'][0]['valueCoding']['display']
                         // document.getElementById("extended_patient").innerText = pt["name"][0]["given"][0];
                     },
                     function(error) {
@@ -380,7 +490,7 @@
                 );
 
                 addMethimazoleMeds(client);
-                addTSHLab(client)
+                initializeTSHData(client);
 
                 // Get MedicationRequests for the selected patient
                 let queryParamsMeds = new URLSearchParams();
@@ -403,7 +513,7 @@
                     function(meds) {
                         // document.getElementById("meds").innerText = JSON.stringify(meds, null, 4);
                         // document.getElementById("meds").innerText = meds[0]['resource']['medicationCodeableConcept']['coding'][0]['display'];
-                        document.getElementById("meds").innerText = meds[0]['resource']['medicationCodeableConcept']['coding'][0]['display'];
+                        // document.getElementById("testMed").innerText = meds[0]['resource']['medicationCodeableConcept']['coding'][0]['display'];
                     },
                     function(error) {
                         document.getElementById("meds").innerText = error.stack;
