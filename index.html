@@ -7,15 +7,6 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
         <script src="https://d3js.org/d3.v4.min.js"></script>
         <style>
-            /* #patient, #extended_patient, #obs {
-                font-family: Monaco, monospace;
-                white-space: pre;
-                font-size: 13px;
-                height: 30vh;
-                overflow: scroll;
-                border: 1px solid #CCC;
-            } */
-
             table, tr, td {
                 border: 1px solid black;
                 text-align: center;
@@ -25,79 +16,123 @@
                 padding-left: 10px;
             }
 
+            thead {
+                position: sticky; 
+                top: 0;
+                z-index: 1;
+                background-color: LightGray;
+            }
+
+            #legend {
+                border: 1px solid black;
+            }
             .maxWidth {
-                max-width: 1200px;
+                max-width: 1000px;
             }
-            .border1px {
+            /* .border1px {
                 border: 1px solid;
-            }
+            } */
+            
             .center {
                 margin: auto;
             }
+            #medTableWrapper {
+                /* width: 700px; */
+                height: 175px;
+                overflow: auto;
+            }
+
+            #MedName {
+                width: 270px;
+            }
+            #PrescrOn{
+                width: 125px;
+            }
+            #Status {
+                width: 90px;
+            }
+
+            .bluetext {
+                color: blue
+            }
+
+            /* #MedName{
+                table-layout: fixed;
+                width: 650px;
+            } */
         </style>
     </head>
     <body>
-        <div id="testBio" class="border1px"></div>
+        <!-- <div id="testBio" class="border1px"></div> -->
         <div id="testMed" class="border1px"></div>
         <div id="testAppointment" class="border1px"></div>
 
         <div class="container border1px">
             <div style="display:flex; flex-direction: row; justify-content: center; align-items: center">
                 <div>
-                    <h1>Thyroid Tracker</h1>
-                    <h5> Hi <span id="greetingName"><span></h5>
+                    <h1>Chronic Thyroidism Tracker</h1>
+                    <div style="display: flex; justify-content: center">
+                        <h5> Hi <span id="greetingName"></span> &nbsp &nbsp</h5>
+                        <button class= "btn btn-secondary" onclick="redirect()">Log out</button>
+                    </div>
                 </div>
                 <div>
-                    <img src="https://www.niddk.nih.gov/-/media/Images/Health-Information/Endocrine-Diseases/ThyroidAnatomy_758x864.jpg" class="img-thumbnail" alt="..." style="width: auto; height: 150px">
+                    <img style="width: auto; height: 100px"src="https://www.niddk.nih.gov/-/media/Images/Health-Information/Endocrine-Diseases/ThyroidAnatomy_758x864.jpg" class="img-thumbnail" alt="..." >
                 </div>
             </div>
+            <div><br></div>
 
             <div class="maxWidth center" style="display:flex; flex-direction: row; justify-content: space-between">
   
                 <div class="border1px">
+                    
                     <div class="maxWidth border1px ">
-                        <h5 class="border1px">Medications</h4>
-                        <ul>
-                            <li id="meds"></li>
-                        </ul>
-                    </div>    
-        
-                    <div class="maxWidth border1px center">
-                        <h5 class="border1px">Appoinment & Lab order</h4>
-                        <ul><li>Next Visit: 2024-04-18</li></ul>
-                        <!-- <p>Next Lab order: 2024-04-18</p> -->
-                    </div>     
-                </div>
 
-                <div class="maxWidth border1px center">
-                    <h4>Bio info</h4>
-                    <table>
-                        <tr>
-                            <td>Full name: </td>
-                            <td id="fullName"></td>
-                        </tr>
-                        <tr>
-                            <td>Gender: </td>
-                            <td id="gender"></td>
-                        </tr>
-                        <tr>
-                            <td>Birth Date: </td>
-                            <td id="dob"></td>
-                        </tr>
-                        <tr>
-                            <td>Race: </td>
-                            <td id="race"></td>
-                        </tr> 
-                        <!-- <tr>
-                            <td>Ethnicity: </td>
-                            <td id="ethnicity"></td>
-                        </tr>  -->
-                    </table>
+                        <h4 class="border1px">Medications</h4>
+                            <div>
+                                <span id='legend' style="background-color: lightyellow;">&nbsp &nbsp &nbsp &nbsp</span> medicine (shaded lightyellow) is specialized for Thyroidism </span>
+                            </div>
+                            <div id="medTableWrapper">
+                                <table id="MedsTable">
+                                    <thead>
+                                        <td>Rxnorm</td>
+                                        <td id="MedName">Medication name</td>
+                                        <td id="PrescrOn">Prescr. on</td>
+                                        <td id="Status">Status</td>
+                                        <td>Request</td>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div><br></div>
+                    </div>
+                    
+                </div>
+                
+                <div>
+                    <div class="maxWidth border1px center">
+                        <h4 id="bioInfo">Bio info</h4>
+                        <ul>
+                            <li>Birth Date: <span id="dob"></span>; &nbsp &nbsp &nbsp Sex: <span id="gender"></span></li>
+                            <li>Race: <span id="race"></span></li>
+                        </ul>
+                    </div>
+                    <div class="maxWidth border1px center">
+                        <h4 class="border1px">Appointments</h4>
+                        <ul>
+                            <li>LAST apmt: <span id="lastApmTime"></span> - <span id="lastApmStatus"></span></li>
+                            <li>NEXT apmt: <span id="nextApmTime" class="bluetext"></span> - <span id="nextApmStatus" class="bluetext"></span></li>
+                        </ul>
+                        <div>
+                            <input type="datetime-local" id="apmSchedule" value="2018-06-12T19:30" min="2018-06-07T00:00" />
+                            <button class="btn btn-danger" onclick="scheduleApmnt()">Schedule</button>
+                        </div>
+                        
+                    </div>  
                 </div>
             </div>
 
             <div class="maxWidth border1px center">
-                <h5>TSH status</h4>
+                <h3>TSH status</h3>
                 <div id="tshTable">
                     <table>
                         <tr>
@@ -108,7 +143,7 @@
                             <td id="date3"></td>
                             <td id="date4"></td>
                             <td>New Date:<input type="text" id="tshNewDate" placeholder="yyyy-mm-dd"></td>
-                            <td rowspan="2"><button onclick="addMoreTSH()">Add TSH <br> result</button></td>
+                            <td rowspan="2"><button onclick="addMoreTSH()" class="btn btn-primary">Add TSH <br> result</button></td>
                         </tr>
                         <tr>
                             <td><b>TSH mIU/L</b></td>
@@ -117,7 +152,7 @@
                             <td id="tsh2"></td>
                             <td id="tsh3"></td>
                             <td id="tsh4"></td>
-                            <td>New TSH: <input type="text" id="tshNewValue" placeholder="#.###"></td>
+                            <td>New TSH: <input type="number" id="tshNewValue" placeholder="#.###"></td>
                         </tr>
                     </table>
                 </div>
@@ -127,12 +162,64 @@
 
         <script type="text/javascript">
             window.globalClient = null
-
+            function redirect() {
+                window.location.href = 'https://launch.smarthealthit.org/'
+            }
+            function scheduleApmnt() {
+                let appointment = {
+                
+                        "resourceType": "Appointment",
+                        "id": "1921887",
+                        "meta": {
+                        "versionId": "2",
+                        "lastUpdated": "2023-08-14T09:53:54.929-04:00"
+                        },
+                        "status": "booked",
+                        "start": "2023-08-01T10:00:00-05:00",
+                        "end": "2023-08-01T10:30:00-05:00",
+                        "slot": [
+                            {
+                                "reference": "Slot/1921708"
+                            }
+                        ],
+                        "created": "2023-08-14T13:53:33.974Z",
+                        "participant": [
+                            {
+                                "actor": {
+                                    "reference": "Location/Location/Location/1921692"
+                                }
+                            },
+                            {
+                                "actor": {
+                                    "reference": "HealthcareService/HealthcareService/1921694"
+                                }
+                            },
+                            {
+                                "actor": {
+                                    "reference": "PractitionerRole/PractitionerRole/null"
+                                }
+                            },
+                            {
+                                "actor": {
+                                    "reference": "Patient/59bc5dbb-1957-47ef-b6b5-25952e6bfdab"
+                                }
+                            }
+                        ]
+                    }
+                appointment["participant"][3]["actor"]['reference'] = "Patient/" + globalClient.patient.id
+                appointment["start"] = document.getElementById("apmSchedule").value + ":00"
+                appointment["end"] = document.getElementById("apmSchedule").value + ":00"
+                appointment["created"] = new Date().toISOString()
+                window.globalClient.create(appointment)
+                alert("You have proposed an appointment time, please wait to see if the doctor can agree. \n (For the demo purpose, the doctor (server) will agree, please log out and log in back to see the Last/Next appointment updated)")
+                console.log('Just created appointment = ')
+                console.log(appointment)
+            }
             function drawData() {
                 n = tsh_result.length
                 tsh_result.sort()
                 console.log(tsh_result)
-                let k = 4;
+                let k = Math.min(4, n);
                 for(i = 1; i <= k; i++) {
                     document.getElementById('date' + i).innerHTML = tsh_result[n-(k-i+1)][0]
                     document.getElementById('tsh' + i).innerHTML = tsh_result[n-(k-i+1)][1]
@@ -142,8 +229,8 @@
                 
                 // margin
                 var margin = {top: 30, right: 90, bottom: 30, left: 60},
-                    svgWidth = 1000,
-                    svgHeight = 380, 
+                    svgWidth = 950,
+                    svgHeight = 300, 
                     width = svgWidth - margin.left - margin.right,
                     height = svgHeight - margin.top - margin.bottom;
                 
@@ -160,7 +247,7 @@
                         .attr('y', 0)
                         .attr('text-anchor', 'middle')
                         .style('font-family', 'Helvetica')
-                        .style('font-size', 30)
+                        .style('font-size', 25)
                         .style('fill', 'red')
                         .text('TSH over time');
                 
@@ -181,7 +268,7 @@
                 
                 // create xScale, yScale
                 xScale = d3.scaleTime().domain(d3.extent(tsh_result, d => d3.timeParse("%Y-%m-%d")(d[0]))).range([0, width]);
-                yScale = d3.scaleLinear().domain([0, 10]).range([height, 0]);
+                yScale = d3.scaleLinear().domain([0, 8]).range([height, 0]);
 
                 // draw X axis, Y axis
                 var reformat_x_tick = function(date) {
@@ -233,7 +320,6 @@
                 svg.append('text') // X label
                     .attr('x', width + 15)
                     .attr('y', yScale(5))
-                    // .attr('text-anchor', 'middle')
                     .style('font-family', 'Helvetica')
                     .style('font-size', 12)
                     .style('fill', 'green')
@@ -251,7 +337,6 @@
                 svg.append('text')
                     .attr('x', width + 15)
                     .attr('y', yScale(0.5))
-                    // .attr('text-anchor', 'middle')
                     .style('font-family', 'Helvetica')
                     .style('font-size', 12)
                     .style('fill', 'green')
@@ -306,10 +391,12 @@
                     }  
                 observation["subject"]["reference"] = "Patient/" + globalClient.patient.id
                 let newDate = document.getElementById('tshNewDate').value
-                let newTSH = document.getElementById('tshNewValue').value
+                let newTSH = Number(document.getElementById('tshNewValue').value)
                 observation.effectiveDateTime = newDate
                 observation.component[0].valueQuantity.value = newTSH 
+
                 window.globalClient.create(observation)
+
                 window.tsh_result.push([newDate, newTSH])
                 // window.tsh_result.sort()
                 d3.select("#tshGraph").selectAll("*").remove();
@@ -320,7 +407,7 @@
                 // showObservation(globalClient);
             }
 
-            function addMethimazoleMeds(client) {
+            function addMeds(client, rxnormCode, nameDisplay, authoredDate) {
                 let medicationRequest = 
                     {
                         "resourceType": "MedicationRequest",
@@ -333,14 +420,18 @@
                             [
                                 {
                                     "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
-                                    "code": "197942",                         // 197941
-                                    "display": "methimazole 5 MG Oral Tablet" // methimazole 10 MG Oral Tablet 
+                                    "code": "197942",                         
+                                    "display": "Methimazole 5 MG Oral Tablet"
                                 }
                             ]
                         },
                         "authoredOn": "2024-03-30T09:51:38+00:00",
-                    }
+                    } // "197942" "methimazole 5 MG Oral Tablet" "2024-03-30T09:51:38+00:00"
                 medicationRequest["subject"]["reference"] = "Patient/" + client.patient.id
+                medicationRequest["medicationCodeableConcept"]["coding"][0]["code"] = rxnormCode
+                medicationRequest["medicationCodeableConcept"]["coding"][0]["display"] = nameDisplay
+                medicationRequest["authoredOn"] = authoredDate
+
                 client.create(medicationRequest)
             }
 
@@ -386,11 +477,11 @@
                 sampleTSHdata = [
                     ['2021-08-17', 0.32],
                     ['2021-12-08', 1.58],
-                    ['2022-04-19', 7.89],
-                    ['2022-07-01', 6.23],
+                    ['2022-04-19', 7.21],
+                    ['2022-07-01', 5.23],
                     ['2022-11-15', 2.15],
                     ['2023-02-01', 6.84],
-                    ['2023-07-05', 4.42]
+                    ['2023-07-05', 2.42]
                 ]
 
                 // n = Math.floor(Math.random() * 3 + 3);
@@ -430,17 +521,17 @@
                 // Reject if no Observations are found
                 .then(function(data) {
                     if (!data.entry || !data.entry.length) {
-                        throw new Error("No Observation found for the selected patient");
+                        throw new Error("There is no Observation found ");
                     }
                     return data.entry;
                 })
-                // Render the current patient's Observations (or any error)
+                // Process found observation info
                 .then(
                     function(obs) {
                         // document.getElementById("test").innerText = JSON.stringify(obs, null, 4);
                         // (obs[0]['resource']['effectiveDateTime'] + ":" + obs[0]['resource']['component'][0]['valueQuantity']['value']);  
                         let n = obs.length
-                        console.log('real count: ' + n)
+                        console.log('real obs count: ' + n)
                         window.tsh_result = []
                         let tsh_map = new Map()
                         for (i = 0; i < n; i++) {
@@ -450,7 +541,6 @@
                         }
                         tsh_map.forEach(function(value, key, map) {window.tsh_result.push([key, value])})
 
-                        
                         // window.tsh_result.sort()
                         // window.tsh_result.forEach(function(item) {
                         //     year  = item[0].substring(0, 4);
@@ -460,6 +550,7 @@
                         // })
                         // console.log(window.tsh_result)
                         drawData();            
+
                     },
                     function(error) {
                         document.getElementById("obs").innerText = error.stack;
@@ -470,56 +561,209 @@
             FHIR.oauth2.ready().then(function(client) {
                 window.globalClient = client
                 
-                // Render the current patient (or any error)
+                // Show patient info
                 client.patient.read().then(
                     function(pt) {
-                        // patient_test = JSON.parse(pt)
-                        document.getElementById("testBio").innerText = JSON.stringify(pt, null, 4);
+                        // document.getElementById("testBio").innerText = JSON.stringify(pt, null, 4);
                         let fullname = pt["name"][0]["given"][0] + " " + pt["name"][0]["family"]
                         document.getElementById('greetingName').innerHTML = fullname
-                        document.getElementById('fullName').innerHTML = fullname
+                        document.getElementById('bioInfo').innerHTML = fullname
 
                         document.getElementById('gender').innerHTML = pt["gender"]
                         document.getElementById('dob').innerHTML = pt["birthDate"]
                         document.getElementById('race').innerHTML = pt['extension'][0]['extension'][0]['valueCoding']['display']
-                        // document.getElementById("extended_patient").innerText = pt["name"][0]["given"][0];
                     },
                     function(error) {
-                        document.getElementById("patient").innerText = error.stack;
+                        console.log("error with reading Patient info")
+                        console.log(error.stack);
                     }
                 );
 
-                addMethimazoleMeds(client);
+                addMeds(client, "197942", "Methimazole 5 MG Oral Tablet", "2024-03-30T09:51:38+00:00");
                 initializeTSHData(client);
 
-                // Get MedicationRequests for the selected patient
+                // Prepare parameters for the MedicationRequests query
                 let queryParamsMeds = new URLSearchParams();
                 queryParamsMeds.set('patient', client.patient.id);
-                queryParamsMeds.set('code', 'http://www.nlm.nih.gov/research/umls/rxnorm|197942');                
+                // queryParamsMeds.set('code', 'http://www.nlm.nih.gov/research/umls/rxnorm|197942');                
                 
                 client.request("/MedicationRequest?" + queryParamsMeds, {
                     resolveReferences: [ "medicationReference" ],
                     graph: true
                 })
                 
-                // Reject if no MedicationRequests are found
+                // Handle when no meds info found
                 .then(function(data) {
                     if (!data.entry || !data.entry.length) {
-                        throw new Error("No medications found for the selected patient");
+                        throw new Error("No meds info found");
                     }
                     return data.entry;
-                }) // Render the current patient's medications (or any error)
+                }) // Process the found meds info
                 .then(
                     function(meds) {
+
+                        let medName = '', medRxnorm = '', medAuthDate = '', medStatus = ''
+
+                        let medsMap = new Map()
+
+                        meds.forEach(med => {
+                            medRxnorm   = med['resource']['medicationCodeableConcept']['coding'][0]['code'] // code
+                            medName     = med['resource']['medicationCodeableConcept']['coding'][0]['display'] // name
+                            medStatus   = med['resource']['status']
+                            medAuthDate = med['resource']['authoredOn'].split('T')[0]
+                            if(medsMap.has(medRxnorm)) {
+                                if(medsMap.get(medRxnorm)[2] < medAuthDate) {
+                                    medsMap.set(medRxnorm, [medName, medStatus, medAuthDate])
+                                }
+                            } else {
+                                medsMap.set(medRxnorm, [medName, medStatus, medAuthDate])
+                            }
+                        });
+
+                        let s = medsMap.size
+                        console.log('real meds count = ' + s)
+                        window.Rxnorms = new Array(s).fill(null)
+                        window.MedNames = new Array(s).fill(null)
+                        window.AuthoredOn = new Array(s).fill(null)
+                        window.MedStatus = new Array(s).fill(null)
+                        window.RefillRequest = new Array(s).fill(null)
+
+                        let currentRow = null
+                        let i = 0
+                        medsMap.forEach((name_status_date, rxnorm) => {
+                            medRxnorm = rxnorm
+                            medName = name_status_date[0]
+                            medStatus = name_status_date[1]
+                            medAuthDate = name_status_date[2]
+
+                            currentRow  = document.createElement('tr')
+                            if(medRxnorm == 197942) {
+                                currentRow.bgColor = 'lightyellow'
+                            }
+                            window.Rxnorms[i] = document.createElement('td')
+                            window.Rxnorms[i].innerHTML = medRxnorm
+                            window.MedNames[i] = document.createElement('td')
+                            window.MedNames[i].innerHTML = medName
+                            window.AuthoredOn[i] = document.createElement('td')
+                            window.AuthoredOn[i].innerHTML = medAuthDate
+                            window.MedStatus[i] = document.createElement('td')
+                            window.MedStatus[i].innerHTML = medStatus
+
+                            console.log('meds ' + i + " " + window.Rxnorms[i].innerHTML + " " + window.AuthoredOn[i].innerHTML + " " + window.MedStatus[i].innerHTML)
+
+                            window.RefillRequest[i] = document.createElement('button')
+                            window.RefillRequest[i].innerHTML = 'Refill'
+                            // window.RefillRequest[i].setAttribute("class", "btn btn-secondary");
+                            
+
+                            currentRow.append(window.Rxnorms[i])
+                            currentRow.append(window.MedNames[i])
+                            currentRow.append(window.AuthoredOn[i])
+                            currentRow.append(window.MedStatus[i])
+                            currentRow.append(window.RefillRequest[i])
+                            MedsTable.append(currentRow)
+
+                            i++;
+
+                        });
+                        for(let i = 0; i < s; i++) {
+                            window.RefillRequest[i].addEventListener('click', function(){
+                                let today = new Date().toISOString().slice(0, 10)
+                                console.log(i + ' window.AuthoredOn[i].innerHTML = ' + window.AuthoredOn[i].innerHTML)
+                                console.log(i + ' window.MedStatus[i].innerHTML = ' + window.MedStatus[i].innerHTML)
+                                window.AuthoredOn[i].innerHTML = '<span style="color:red">' + today + '</span> <br> <span style="color:blue">' +  window.AuthoredOn[i].innerHTML + "</span>"
+                                window.MedStatus[i].innerHTML = '<span style="color:red">Requested </span> <br> <span style="color:blue">' + window.MedStatus[i].innerHTML + "</span>"                               
+                                addMeds(window.globalClient, window.Rxnorms[i].innerHTML, window.MedNames[i].innerHTML, today)
+                                alert("You have requested for a refill, please wait for the doctor's approval. \n (For the demo purpose, the doctor (server) will approve, please log out and log in back to see the 'Prescribed On' will be updated to the request date)")
+                                window.RefillRequest[i].disabled = true
+                            });
+                        }
+                    },
                         // document.getElementById("meds").innerText = JSON.stringify(meds, null, 4);
                         // document.getElementById("meds").innerText = meds[0]['resource']['medicationCodeableConcept']['coding'][0]['display'];
                         // document.getElementById("testMed").innerText = meds[0]['resource']['medicationCodeableConcept']['coding'][0]['display'];
-                    },
                     function(error) {
-                        document.getElementById("meds").innerText = error.stack;
+                        console.log("error with reading meds info")
+                        console.log(error.stack);
                     }
                 );
                 showObservation(client);
+                
+                let queryParamsApps = new URLSearchParams();
+                queryParamsApps.set('patient', client.patient.id);
+                client.request("/Appointment?" + queryParamsApps, {
+                    resolveReferences: [ "appointmentReference" ],
+                    graph: true
+                })
+                
+                .then(function(data) {
+                    if (!data.entry || !data.entry.length) {
+                        throw new Error("No appointment info found");
+                    }
+                    return data.entry;
+                }) 
+                .then(
+                    function(apms) {
+                        // document.getElementById("testAppointment").innerText = JSON.stringify(apms, null, 4); 
+                        let m = apms.length
+                        console.log("appointment count = " + m)
+                        let appointments = []
+                        let apmDate = ""
+                        let apmStatus = ""
+                        for(let i = 0; i < m; i++) {
+                            // console.log(i + "apms = " + apms[i]['resource'])
+                            if (apms[i]['resource'].hasOwnProperty('start')) {
+                                apmDate = apms[i]['resource']['start'].substring(0, 16)
+                                apmStatus = apms[i]['resource']['status']
+                                appointments.push([apmDate, apmStatus])
+                            } else if (apms[i]['resource'].hasOwnProperty('requestedPeriod')) {
+                                apmDate = apms[i]['resource']['requestedPeriod'][0]['start'].substring(0, 16)
+                                apmStatus = apms[i]['resource']['requestedPeriod'][0]['status']
+                                appointments.push([apmDate, apmStatus])
+
+                            }
+                        }
+                        m = appointments.length
+                        appointments.sort()
+                        console.log("app list = ")
+                        console.log(appointments)
+
+                        let today = new Date().toISOString().split('T')[0]
+                        let last_appointment = ""
+                        let last_appointment_status = ""
+                        let upcoming_appointment = ""
+                        let upcoming_appointment_status = ""
+                        let i = m-1
+                        while (i >= 0 && appointments[i][0].substring(0, 10) > today) {
+                            i--;
+                        }
+                        last_appointment = appointments[i][0]
+                        last_appointment_status = appointments[i][1]
+
+                        if (i != m-1) {
+                            upcoming_appointment = appointments[i+1][0]
+                            upcoming_appointment_status = appointments[i+1][1]
+                        }
+                        document.getElementById("lastApmTime").innerHTML = last_appointment
+                        document.getElementById("lastApmStatus").innerHTML = last_appointment_status
+                        document.getElementById("nextApmTime").innerHTML = upcoming_appointment
+                        document.getElementById("nextApmStatus").innerHTML = upcoming_appointment_status
+                        
+                        if (upcoming_appointment)
+                            alert("Your upcoming appointment is at: " + upcoming_appointment)
+                        // let tomorrow = new Date()
+                        // tomorrow.setDate(tomorrow.getDate() + 1)
+                        // let tomorrow_str = tomorrow.toISOString().split('T')[0] + "T00:00"
+                        // document.getElementById("apmSchedule").value=tomorrow_str
+                        // document.getElementById("apmSchedule").min=tomorrow_str
+                        
+                    },
+                    function(error) {
+                        // document.getElementById("testAppointment").innerText = error.stack;
+                        console.log("error with reading Appointment info")
+                        console.log(error.stack);
+                    }
+                );
             }).catch(console.error);
         </script>
     </body>
